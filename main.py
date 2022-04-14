@@ -4,8 +4,7 @@ from sim.channels import Channel, ChannelBalancer
 from sim.request import Request, RequestCounter
 
 
-def is_request(step:float,income_intensity:float) -> bool:
-    return income_intensity * step > random()
+
 
 
 if __name__ == '__main__':

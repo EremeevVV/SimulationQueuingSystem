@@ -7,3 +7,7 @@ class RestrictedQueue(Queue):
             raise BufferError('Queue is full')
         return self.put(item, block=False)
 
+    def get_nowait(self):
+        if self.empty():
+            raise BufferError('Queue is empty')
+        return self.get(block=False)

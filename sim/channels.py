@@ -43,6 +43,12 @@ class ChannelBalancer:
             raise ValueError('There are must be at least one channel')
         self.channels = channels
 
+    def check_available_channels(self) -> bool:
+        for channel in self.channels:
+            if channel.free:
+                return True
+        return False
+
     def put(self, request: Request) -> Request:
         """Put request in available channel"""
         for index, channel in enumerate(self.channels):

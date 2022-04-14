@@ -1,4 +1,4 @@
-from main import is_request
+from sim.simulation_systems import is_request
 from sim.channels import Channel, ChannelBalancer
 from sim.request import Request
 from collections import Counter
