@@ -1,10 +1,13 @@
 from dataclasses import dataclass, field
+from typing import Optional
+
 
 @dataclass
 class Request:
     create_time: float
     time_in_queue: float = 0
     time_in_processing: float = 0
+    used_channel_index: Optional[int] = None
 
 @dataclass
 class RequestCounter:

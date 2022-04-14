@@ -1,4 +1,5 @@
 import math
+from copy import copy, deepcopy
 from random import random
 from typing import Callable, Optional
 
@@ -19,22 +20,21 @@ class Channel:
     def _generate_processing_time(self):
         return self.distribution_function(self.processing_intensity)
 
-    def put(self, request: Request):
+    def put(self, request: Request) -> Optional[Request]:
         if self.free:
             self.free = False
             self.processing_time = self._generate_processing_time()
             self.request = request
             self.request.time_in_processing = self.processing_time
+            return self.request
         else:
             raise BufferError('Channel is busy')
 
-    def step(self, step_time: float) -> Optional[Request]:
+    def step(self, step_time: float) -> None:
         self.processing_time -= step_time
         if self.processing_time <= 0:
-            if self.free:
-                self.request = None
+            self.request = None
             self.free = True
-            return self.request
 
 class ChannelBalancer:
 
@@ -43,28 +43,20 @@ class ChannelBalancer:
             raise ValueError('There are must be at least one channel')
         self.channels = channels
 
-    def get_free_channel(self):
-        for channel in self.channels:
+    def put(self, request: Request) -> Request:
+        """Put request in available channel"""
+        for index, channel in enumerate(self.channels):
             if channel.free:
-                return channel
-
-    def put(self, request:Request):
-        """Put request in availiable channel"""
-        free_channel = self.get_free_channel()
-        if free_channel:
-            free_channel.put(request)
+                request.used_channel_index = index
+                return channel.put(request)
         else:
-            raise BufferError('There are no avaliable channels')
+            raise BufferError('There are no available channels')
 
-    def step(self, step_time: float) -> list[Request]:
+    def step(self, step_time: float) -> None :
         """If in one step come more then one result"""
-        finished_requests_lst = []
-        finished_request = None
         for channel in self.channels:
             if channel.free is False:
-                finished_request = channel.step(step_time)
-            if finished_request:
-                finished_requests_lst.append(finished_request)
-        return finished_requests_lst
+                channel.step(step_time)
+
 
 
