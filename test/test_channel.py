@@ -62,3 +62,51 @@ def test_clean_request_expired_step():
     result = channel.step(step)
     # Then
     assert result is None and channel.free and channel.request is None
+
+def test_channel_balancer_success_get_free_channel():
+    # Given
+    cb = ChannelBalancer([Channel(processing_intensity=10), Channel(processing_intensity=5)])
+    request = Request(0.1)
+    # When
+    free_channel = cb.get_free_channel()
+    free_channel.put(request)
+    free_channel = cb.get_free_channel()
+    # Then
+    assert free_channel.processing_intensity == 5
+
+def test_channel_balancer_empty_get_free_channel():
+    # Given
+    cb = ChannelBalancer([Channel(processing_intensity=10), Channel(processing_intensity=5)])
+    request = Request(0.1)
+    # When
+    free_channel = cb.get_free_channel()
+    free_channel.put(request)
+    free_channel = cb.get_free_channel()
+    free_channel.put(request)
+    free_channel = cb.get_free_channel()
+    # Then
+    assert free_channel is None
+
+def test_channel_balancer_success_put():
+    # Given
+    cb = ChannelBalancer([Channel(processing_intensity=10), Channel(processing_intensity=5)])
+    request = Request(0.1)
+    # When
+    cb.put(request)
+    # Then
+    assert cb.get_free_channel()
+
+def test_channel_balancer_fail_put():
+    # Given
+    cb = ChannelBalancer([Channel(processing_intensity=10), Channel(processing_intensity=5)])
+    request = Request(0.1)
+    cathched_error = False
+    # When
+    cb.put(request)
+    cb.put(request)
+    try:
+        cb.put(request)
+    except BufferError:
+        cathched_error = True
+    # Then
+    assert cathched_error

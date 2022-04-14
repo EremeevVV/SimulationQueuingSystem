@@ -19,9 +19,7 @@ if __name__ == '__main__':
     # smo = SimulationQueuingSystem(num_channels=2, max_queue_length=4, processing_intensity=2)
     current_time = 0
 
-    channel1 = Channel(processing_intensity)
-    channel2 = Channel(processing_intensity)
-    cb = ChannelBalancer(channels=[channel1, channel2])
+    cb = ChannelBalancer(channels=[Channel(processing_intensity), Channel(processing_intensity)])
     result_lst = []
     while current_time < 1:
         request = None

@@ -48,6 +48,14 @@ class ChannelBalancer:
             if channel.free:
                 return channel
 
+    def put(self, request:Request):
+        """Put request in availiable channel"""
+        free_channel = self.get_free_channel()
+        if free_channel:
+            free_channel.put(request)
+        else:
+            raise BufferError('There are no avaliable channels')
+
     def step(self, step_time: float) -> list[Request]:
         """If in one step come more then one result"""
         finished_requests_lst = []
