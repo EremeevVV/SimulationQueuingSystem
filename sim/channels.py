@@ -36,10 +36,11 @@ class Channel:
             self.request = None
             self.free = True
 
+
 class ChannelBalancer:
 
     def __init__(self, channels: list[Channel]) -> None:
-        if len(channels)<1:
+        if len(channels) < 1:
             raise ValueError('There are must be at least one channel')
         self.channels = channels
 
@@ -58,11 +59,8 @@ class ChannelBalancer:
         else:
             raise BufferError('There are no available channels')
 
-    def step(self, step_time: float) -> None :
+    def step(self, step_time: float) -> None:
         """If in one step come more then one result"""
         for channel in self.channels:
             if channel.free is False:
                 channel.step(step_time)
-
-
-

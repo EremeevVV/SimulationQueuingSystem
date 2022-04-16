@@ -1,30 +1,27 @@
-from random import random
+from dataclasses import dataclass
 
-from sim.channels import Channel, ChannelBalancer
+from sim.channels import ChannelBalancer
 from sim.custom_queue import RestrictedQueue
 from sim.request import RequestCounter, Request
+from sim.timer import Timer
 
 
-def is_request(step:float,income_intensity:float) -> bool:
-    return income_intensity * step > random()
-
-
+@dataclass
 class SimulationQueuingSystem:
 
-    def __init__(self, num_channels: int, max_queue_length: int, processing_intensity: float) -> None:
-        self.queue = RestrictedQueue(maxsize=max_queue_length)
-        self.cb = ChannelBalancer([Channel(processing_intensity) for _ in range(num_channels)])
-        self.request_counter = RequestCounter()
-        self.current_time = 0
+    queue: RestrictedQueue
+    cb: ChannelBalancer
+    request_counter: RequestCounter
+    timer: Timer
 
-
-    def step(self, step_time: float, request: Request = None):
-
+    def step(self, request: Request = None):
         if request:
+            request.create_time = self.timer.get_current_time()
             if self.queue.qsize() < 1:
                 try:
                     result = self.cb.put(request)
-                    self.request_counter.add_success_request(result)
+                    if result:
+                        self.request_counter.add_success_request(result)
                 except BufferError:
                     self.queue.put_nowait(request)
             else:
@@ -38,7 +35,7 @@ class SimulationQueuingSystem:
                 from_queue = self.queue.get_nowait()
                 try:
                     result = self.cb.put(from_queue)
-                    result.time_in_queue = self.current_time - result.create_time
+                    result.time_in_queue = self.timer.get_current_time() - result.create_time
                     self.request_counter.add_success_request(result)
                 except BufferError:
                     raise Exception(
@@ -46,14 +43,5 @@ class SimulationQueuingSystem:
             except BufferError:
                 #  Queue is empty and no request
                 pass
-        self.cb.step(step_time)
-
-    def cycle(self, step: float, income_intensity: float, start_time: float = .0, end_time: float = .0) -> None:
-        self.current_time = start_time
-        while self.current_time < end_time:
-            if is_request(step, income_intensity):
-                request = Request(self.current_time)
-            else:
-                request = None
-            self.step(step, request)
-            self.current_time += step
+        self.cb.step(self.timer.step_duration)
+        self.timer.step()
