@@ -1,6 +1,7 @@
 from random import random
 
-from sim.request import Request, generate_request, RequestCounter
+from sim.request import Request, generate_request
+from sim.counters import RequestCounter
 from sim.simulation_systems import SimulationQueuingSystem
 from sim.timer import Timer
 from sim.custom_queue import RestrictedQueue
@@ -26,5 +27,7 @@ if __name__ == '__main__':
     for t in range(150000):
         request = generate_request(step * income_intensity)
         sim.step(request)
-    print(sim.request_counter.rejected_counter)
+
+
+
 

@@ -2,7 +2,8 @@ from dataclasses import dataclass
 
 from sim.channels import ChannelBalancer
 from sim.custom_queue import RestrictedQueue
-from sim.request import RequestCounter, Request
+from sim.request import Request
+from sim.counters import RequestCounter
 from sim.timer import Timer
 
 
@@ -45,3 +46,6 @@ class SimulationQueuingSystem:
                 pass
         self.cb.step(self.timer.step_duration)
         self.timer.step()
+        self.request_counter.increase_step_count()
+        self.request_counter.calculate_mean_queue(self.queue.qsize())
+        self.request_counter.calculate_mean_busy_channels(self.cb.count_busy())

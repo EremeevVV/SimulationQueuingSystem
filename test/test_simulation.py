@@ -1,4 +1,5 @@
-from sim.request import Request, generate_request, RequestCounter
+from sim.request import Request, generate_request
+from sim.counters import RequestCounter
 from sim.simulation_systems import SimulationQueuingSystem
 from sim.timer import Timer
 from sim.custom_queue import RestrictedQueue

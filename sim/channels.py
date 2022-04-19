@@ -1,5 +1,6 @@
 import math
 from copy import copy, deepcopy
+from itertools import count
 from random import random
 from typing import Callable, Optional
 
@@ -64,3 +65,6 @@ class ChannelBalancer:
         for channel in self.channels:
             if channel.free is False:
                 channel.step(step_time)
+
+    def count_busy(self):
+        return len([channel for channel in self.channels if channel.free is False])
