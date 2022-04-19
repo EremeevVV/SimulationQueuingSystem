@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from statistics import mean
 
 from sim.request import Request
 
@@ -68,3 +69,6 @@ class RequestCounter:
     def get_reject_probability(self):
         # Pотказа–вероятность отказа, вероятность того, что заявка покинет СМО необслуженной
         return len(self.rejected_counter) / (len(self.success_counter) + len(self.rejected_counter))
+
+    def get_mean_time_in_queue(self):
+        return mean([request.time_in_queue for request in self.success_counter if request.time_in_queue > 0])

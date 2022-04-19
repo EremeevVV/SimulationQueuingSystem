@@ -6,7 +6,7 @@ from sim.custom_queue import RestrictedQueue
 from sim.channels import ChannelBalancer, Channel
 
 if __name__ == '__main__':
-    end_time = 150000
+    end_time = 150_000
     step = 0.0001
     max_queue_length = 4
     income_intensity = 4.8
@@ -29,7 +29,9 @@ if __name__ == '__main__':
           f'Request in queue = {sim.queue.qsize()}')
     for index, name in enumerate(sim.state_counter.states_names):
         print(f'{name} : {sim.state_counter.get_probability_be_in_state(index)}')
-    print(f'Mean_queue = {sim.state_counter.get_mean_queue()}, mean_busy_channels = {sim.state_counter.get_mean_busy_channels()}')
+    print(f'Mean queue = {sim.state_counter.get_mean_queue()}, '
+          f'mean busy channels = {sim.state_counter.get_mean_busy_channels()}, '
+          f'mean time in queue = {sim.request_counter.get_mean_time_in_queue()}')
     print(f'абсолютная пропускная способность СМО, среднее число заявок, обслуживаемых в единицу времени = '
           f'{sim.request_counter.get_absolute_bandwidth(end_time)}')
     print(f'относительная пропускная способность, средняя доля пришедших заявок, обслуживаемых системой = '

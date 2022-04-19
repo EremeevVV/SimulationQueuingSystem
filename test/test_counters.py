@@ -102,3 +102,14 @@ def test_request_counter_get_reject_probability():
     result = rc.get_reject_probability()
     # Then
     assert result == reject_count / (success_count + reject_count)
+
+
+def test_request_counter_get_mean_time_in_queue():
+    # Given
+    rc = RequestCounter()
+    success_count = 7
+    rc.success_counter = [Request(i,i) for i in range(success_count)]
+    # When
+    result = rc.get_mean_time_in_queue()
+    # Then
+    assert result == 21/6
